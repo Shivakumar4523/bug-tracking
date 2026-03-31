@@ -1,0 +1,17 @@
+{
+  "name": "pirnav-task-management-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Workspace scripts for the PIRNAV task management app",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "npm run start --prefix server",
+    "reset:default-user": "npm run reset:default-user --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

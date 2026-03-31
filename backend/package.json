@@ -1,0 +1,23 @@
+{
+  "name": "pirnav-task-management-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Express and MongoDB backend for the PIRNAV task management app",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "reset:default-user": "node scripts/resetDefaultUser.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
