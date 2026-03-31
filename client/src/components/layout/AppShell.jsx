@@ -6,7 +6,7 @@ const AppShell = () => {
     <div className="min-h-screen bg-transparent">
       <Navbar />
 
-      <main className="mx-auto min-w-0 max-w-[1440px] px-4 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8 lg:px-8">
+      <main className="mx-auto min-w-0 max-w-[1760px] px-3 pb-10 pt-6 sm:px-4 sm:pb-12 sm:pt-8 lg:px-6">
         <Outlet />
       </main>
     </div>

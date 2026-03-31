@@ -426,7 +426,7 @@ const AdminDashboardPage = () => {
         )}
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid gap-6 xl:grid-cols-2">
         <Card>
           <CardHeader>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
