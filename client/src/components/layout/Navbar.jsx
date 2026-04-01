@@ -12,7 +12,7 @@ const Navbar = ({ onOpenSidebar }) => {
   const role = normalizeRole(user?.role);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
+    <header className="border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
       <div className="mx-auto w-full max-w-[1880px] px-3 py-4 sm:px-4 lg:px-6">
         <div className="rounded-[30px] border border-slate-200/80 bg-[linear-gradient(115deg,rgba(248,250,252,0.88),rgba(255,255,255,0.98)_36%,rgba(239,246,255,0.92)_100%)] px-4 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_20px_44px_rgba(15,23,42,0.08)] sm:px-5">
           <div className="flex flex-col gap-4 xl:grid xl:grid-cols-[minmax(0,360px)_minmax(0,1fr)_auto] xl:items-center xl:gap-4">

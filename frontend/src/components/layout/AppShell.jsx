@@ -5,7 +5,6 @@ import Sidebar from "@/components/layout/Sidebar";
 
 const AppShell = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-transparent">
@@ -13,10 +12,8 @@ const AppShell = () => {
 
       <div className="mx-auto flex min-h-[calc(100vh-98px)] w-full max-w-[1880px] gap-4 px-3 pb-6 pt-4 sm:px-4 sm:pb-8 lg:px-6">
         <Sidebar
-          isCollapsed={isSidebarCollapsed}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
-          onToggleCollapse={() => setIsSidebarCollapsed((current) => !current)}
         />
 
         <main className="min-w-0 flex-1">

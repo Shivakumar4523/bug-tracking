@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   FolderKanban,
+  Search,
   ShieldCheck,
   Trash2,
   UploadCloud,
@@ -29,6 +30,7 @@ import CreateTeamDialog from "@/components/teams/CreateTeamDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import BulkUserImportDialog from "@/components/users/BulkUserImportDialog";
@@ -49,6 +51,8 @@ const PeopleTeamsPage = () => {
   const [editingProject, setEditingProject] = useState(null);
   const [deletingUserId, setDeletingUserId] = useState("");
   const [deletingProjectId, setDeletingProjectId] = useState("");
+  const [userSearch, setUserSearch] = useState("");
+  const deferredUserSearch = useDeferredValue(userSearch);
 
   const {
     data: users = [],
@@ -84,6 +88,22 @@ const PeopleTeamsPage = () => {
     () => users.filter((entry) => entry.role !== "Admin"),
     [users]
   );
+
+  const filteredUsers = useMemo(() => {
+    const query = deferredUserSearch.trim().toLowerCase();
+
+    if (!query) {
+      return users;
+    }
+
+    return users.filter((entry) =>
+      [entry.name, entry.email, entry.role].some((value) =>
+        String(value || "")
+          .toLowerCase()
+          .includes(query)
+      )
+    );
+  }, [deferredUserSearch, users]);
 
   const createUserMutation = useMutation({
     mutationFn: createUser,
@@ -225,14 +245,41 @@ const PeopleTeamsPage = () => {
       <section className="grid gap-6 xl:grid-cols-2">
         <Card className="border border-slate-200/90 bg-white/92">
           <CardContent className="p-6">
-            <div className="mb-5 flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-semibold text-slate-900">User management</h2>
-                <p className="text-sm text-slate-500">
-                  Create users, bulk import them, and remove access cleanly.
-                </p>
+            <div className="mb-5 space-y-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900">User management</h2>
+                  <p className="text-sm text-slate-500">
+                    Create users, bulk import them, and remove access cleanly.
+                  </p>
+                </div>
+                <Badge variant="secondary">
+                  {userSearch.trim() ? `${filteredUsers.length}/${users.length} users` : `${users.length} users`}
+                </Badge>
               </div>
-              <Badge variant="secondary">{users.length} users</Badge>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative w-full sm:max-w-sm">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    className="pl-11"
+                    placeholder="Search users by name, email, or role"
+                    value={userSearch}
+                    onChange={(event) => setUserSearch(event.target.value)}
+                  />
+                </div>
+
+                {userSearch.trim() ? (
+                  <Button
+                    size="sm"
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setUserSearch("")}
+                  >
+                    Clear
+                  </Button>
+                ) : null}
+              </div>
             </div>
 
             {isUsersLoading ? (
@@ -241,10 +288,10 @@ const PeopleTeamsPage = () => {
                 <Skeleton className="h-20 w-full" />
                 <Skeleton className="h-20 w-full" />
               </div>
-            ) : users.length ? (
+            ) : filteredUsers.length ? (
               <ScrollArea className="h-[420px]">
                 <div className="space-y-3 pr-3">
-                  {users.map((entry) => (
+                  {filteredUsers.map((entry) => (
                     <div
                       key={entry._id}
                       className="rounded-[24px] border border-slate-200 bg-slate-50 p-4"
@@ -291,6 +338,17 @@ const PeopleTeamsPage = () => {
                   ))}
                 </div>
               </ScrollArea>
+            ) : users.length ? (
+              <EmptyState
+                title="No matching users"
+                description="Try a different name, email, or role to find the user you need."
+                action={
+                  <Button type="button" variant="secondary" onClick={() => setUserSearch("")}>
+                    Clear Search
+                  </Button>
+                }
+                icon={<Search className="h-5 w-5" />}
+              />
             ) : (
               <EmptyState
                 title="No users yet"
