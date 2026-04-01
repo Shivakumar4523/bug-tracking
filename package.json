@@ -5,11 +5,11 @@
   "description": "Workspace scripts for the PIRNAV task management app",
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:server": "npm run dev --prefix server",
-    "dev:client": "npm run dev --prefix client",
-    "build": "npm run build --prefix client",
-    "start": "npm run start --prefix server",
-    "reset:default-user": "npm run reset:default-user --prefix server"
+    "dev:server": "cd backend && npm run dev",
+    "dev:client": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm run start",
+    "reset:default-user": "cd backend && npm run reset:default-user"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

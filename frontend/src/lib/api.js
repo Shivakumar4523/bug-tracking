@@ -65,6 +65,11 @@ export const createProject = async (payload) => {
   return response.data;
 };
 
+export const updateProject = async ({ id, payload }) => {
+  const response = await api.put(`/projects/${id}`, payload);
+  return response.data;
+};
+
 export const deleteProject = async (id) => {
   const response = await api.delete(`/projects/${id}`);
   return response.data;
@@ -111,6 +116,43 @@ export const updateTask = async ({ id, payload }) => {
 
 export const deleteTask = async (id) => {
   const response = await api.delete(`/tasks/${id}`);
+  return response.data;
+};
+
+export const fetchIssues = async (filters = {}) => {
+  const response = await api.get("/issues", {
+    params: buildParams(filters),
+  });
+  return response.data;
+};
+
+export const createIssue = async (payload) => {
+  const response = await api.post("/issues", payload);
+  return response.data;
+};
+
+export const updateIssue = async ({ id, payload }) => {
+  const response = await api.put(`/issues/${id}`, payload);
+  return response.data;
+};
+
+export const deleteIssue = async (id) => {
+  const response = await api.delete(`/issues/${id}`);
+  return response.data;
+};
+
+export const importIssues = async (payload) => {
+  const response = await api.post("/issues/import", payload);
+  return response.data;
+};
+
+export const fetchComments = async (issueId) => {
+  const response = await api.get(`/comments/${issueId}`);
+  return response.data;
+};
+
+export const createComment = async (payload) => {
+  const response = await api.post("/comments", payload);
   return response.data;
 };
 

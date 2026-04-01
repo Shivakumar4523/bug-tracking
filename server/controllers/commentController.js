@@ -3,6 +3,7 @@ const Comment = require("../models/Comment");
 const Issue = require("../models/Issue");
 const Project = require("../models/Project");
 const asyncHandler = require("../utils/asyncHandler");
+const { isAdminRole } = require("../utils/roles");
 
 const getAccessibleIssue = async (userId, issueId) => {
   const issue = await Issue.findById(issueId);
@@ -13,7 +14,11 @@ const getAccessibleIssue = async (userId, issueId) => {
 
   const project = await Project.findOne({
     _id: issue.projectId,
-    members: userId,
+    ...(isAdminRole(userId?.role)
+      ? {}
+      : {
+          $or: [{ members: userId._id }, { owner: userId._id }],
+        }),
   });
 
   if (!project) {
@@ -36,7 +41,7 @@ const createComment = asyncHandler(async (req, res) => {
     throw new Error("Invalid issue id");
   }
 
-  const issue = await getAccessibleIssue(req.user._id, issueId);
+  const issue = await getAccessibleIssue(req.user, issueId);
 
   if (!issue) {
     res.status(404);
@@ -60,7 +65,7 @@ const getComments = asyncHandler(async (req, res) => {
     throw new Error("Invalid issue id");
   }
 
-  const issue = await getAccessibleIssue(req.user._id, req.params.issueId);
+  const issue = await getAccessibleIssue(req.user, req.params.issueId);
 
   if (!issue) {
     res.status(404);

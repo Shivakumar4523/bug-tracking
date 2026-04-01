@@ -1,31 +1,43 @@
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 const IssueFilters = ({ filters, projects, assignees, onChange, onReset, total }) => (
-  <Card>
+  <Card className="border border-slate-200/90 bg-white/90">
     <CardContent className="space-y-5 p-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-sm font-semibold text-slate-900">Board filters</p>
+          <p className="text-sm font-semibold text-slate-900">Filters and issue search</p>
           <p className="text-sm text-slate-500">
-            Narrow the board by project, status, priority, or assignee.
+            Search by text, then narrow results by project, status, priority, or assignee.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <p className="text-sm text-slate-500">{total} visible issues</p>
-          <Button variant="ghost" size="sm" type="button" onClick={onReset}>
+          <Button size="sm" type="button" variant="ghost" onClick={onReset}>
             <RotateCcw className="h-4 w-4" />
             Reset
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-4">
+      <div className="grid gap-4 xl:grid-cols-5">
+        <label className="space-y-2 xl:col-span-2">
+          <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Search</span>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              className="pl-11"
+              placeholder="Search titles, descriptions, or issue types"
+              value={filters.search}
+              onChange={(event) => onChange("search", event.target.value)}
+            />
+          </div>
+        </label>
+
         <label className="space-y-2">
-          <span className="text-xs uppercase tracking-[0.22em] text-slate-500">
-            Project
-          </span>
+          <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Project</span>
           <select
             className="field-select"
             value={filters.projectId}
@@ -41,9 +53,7 @@ const IssueFilters = ({ filters, projects, assignees, onChange, onReset, total }
         </label>
 
         <label className="space-y-2">
-          <span className="text-xs uppercase tracking-[0.22em] text-slate-500">
-            Status
-          </span>
+          <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Status</span>
           <select
             className="field-select"
             value={filters.status}
@@ -57,9 +67,7 @@ const IssueFilters = ({ filters, projects, assignees, onChange, onReset, total }
         </label>
 
         <label className="space-y-2">
-          <span className="text-xs uppercase tracking-[0.22em] text-slate-500">
-            Priority
-          </span>
+          <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Priority</span>
           <select
             className="field-select"
             value={filters.priority}
@@ -73,9 +81,7 @@ const IssueFilters = ({ filters, projects, assignees, onChange, onReset, total }
         </label>
 
         <label className="space-y-2">
-          <span className="text-xs uppercase tracking-[0.22em] text-slate-500">
-            Assignee
-          </span>
+          <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Assignee</span>
           <select
             className="field-select"
             value={filters.assignee}

@@ -10,52 +10,55 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MessageSquareText, UserCircle2 } from "lucide-react";
+import {
+  CalendarDays,
+  GripVertical,
+  MessageSquareText,
+  UserCircle2,
+} from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { getInitials } from "@/lib/utils";
+import {
+  getIssuePriorityVariant,
+  getIssueStatusLabel,
+  issueColumns,
+} from "@/lib/workspace";
+import { cn, formatDate, getInitials } from "@/lib/utils";
 
-const columns = [
-  {
-    id: "todo",
-    label: "To Do",
-    description: "Queued for triage or ready for pickup.",
-  },
-  {
-    id: "inprogress",
-    label: "In Progress",
-    description: "Actively being worked on by the team.",
-  },
-  {
-    id: "done",
-    label: "Done",
-    description: "Validated, resolved, or shipped.",
-  },
-];
-
-const priorityVariant = {
-  Low: "secondary",
-  Medium: "warning",
-  High: "danger",
-};
-
-const IssueCardBody = ({ issue, onOpen, handleProps = {}, isDragging = false }) => (
+const IssueCardBody = ({
+  issue,
+  onOpen,
+  handleProps = {},
+  isDragging = false,
+  isSelected = false,
+}) => (
   <button
-    className={`w-full rounded-[26px] border p-4 text-left transition duration-200 ${
+    className={cn(
+      "w-full rounded-[26px] border p-4 text-left transition duration-200",
       isDragging
-        ? "border-blue-200 bg-blue-50 shadow-[0_18px_40px_rgba(59,130,246,0.14)]"
-        : "border-slate-200 bg-white hover:border-blue-200 hover:bg-slate-50"
-    }`}
+        ? "border-teal-200 bg-teal-50 shadow-[0_20px_44px_rgba(20,184,166,0.16)]"
+        : isSelected
+          ? "border-slate-900 bg-slate-900 text-white shadow-[0_22px_44px_rgba(15,23,42,0.2)]"
+          : "border-slate-200 bg-white hover:border-teal-200 hover:bg-slate-50"
+    )}
     type="button"
     onClick={() => onOpen(issue)}
   >
     <div className="flex items-start justify-between gap-3">
-      <Badge variant={priorityVariant[issue.priority] || "secondary"}>
-        {issue.priority}
-      </Badge>
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge variant={getIssuePriorityVariant(issue.priority)}>{issue.priority}</Badge>
+        <Badge variant={isSelected ? "outline" : "secondary"}>
+          {issue.projectId?.key || issue.projectId?.name || "Project"}
+        </Badge>
+      </div>
       <div
-        className="cursor-grab rounded-xl border border-slate-200 p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
+        className={cn(
+          "cursor-grab rounded-xl border p-2 transition",
+          isSelected
+            ? "border-white/15 bg-white/10 text-white"
+            : "border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
+        )}
         {...handleProps}
         onClick={(event) => event.stopPropagation()}
       >
@@ -64,32 +67,66 @@ const IssueCardBody = ({ issue, onOpen, handleProps = {}, isDragging = false }) 
     </div>
 
     <div className="mt-4">
-      <p className="text-base font-semibold text-slate-900">{issue.title}</p>
-      <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-500">
+      <p className="text-base font-semibold">{issue.title}</p>
+      <p
+        className={cn(
+          "mt-2 line-clamp-3 text-sm leading-6",
+          isSelected ? "text-slate-200" : "text-slate-500"
+        )}
+      >
         {issue.description || "No additional detail provided."}
       </p>
     </div>
 
     <div className="mt-4 flex flex-wrap items-center gap-2">
-      <Badge variant="outline">{issue.type}</Badge>
-      <Badge variant="secondary">{issue.projectId?.name || "Project"}</Badge>
+      <Badge variant={isSelected ? "outline" : "secondary"}>{issue.type}</Badge>
+      <Badge variant="outline">{getIssueStatusLabel(issue.status)}</Badge>
     </div>
 
-    <div className="mt-5 flex items-center justify-between gap-4">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
+    <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+      <div
+        className={cn(
+          "flex items-center gap-2 text-xs",
+          isSelected ? "text-slate-200" : "text-slate-500"
+        )}
+      >
         <MessageSquareText className="h-4 w-4" />
         <span>Open details</span>
       </div>
 
+      {issue.dueDate ? (
+        <div
+          className={cn(
+            "flex items-center gap-1.5 text-xs",
+            isSelected ? "text-slate-200" : "text-slate-500"
+          )}
+        >
+          <CalendarDays className="h-3.5 w-3.5" />
+          <span>{formatDate(issue.dueDate)}</span>
+        </div>
+      ) : null}
+
       {issue.assignee ? (
-        <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1.5">
+        <div
+          className={cn(
+            "flex items-center gap-2 rounded-full border px-2.5 py-1.5",
+            isSelected
+              ? "border-white/15 bg-white/10"
+              : "border-slate-200 bg-slate-50"
+          )}
+        >
           <Avatar className="h-7 w-7">
             <AvatarFallback>{getInitials(issue.assignee?.name)}</AvatarFallback>
           </Avatar>
-          <span className="text-xs text-slate-600">{issue.assignee?.name}</span>
+          <span className="text-xs">{issue.assignee?.name}</span>
         </div>
       ) : (
-        <div className="flex items-center gap-2 text-xs text-slate-500">
+        <div
+          className={cn(
+            "flex items-center gap-2 text-xs",
+            isSelected ? "text-slate-200" : "text-slate-500"
+          )}
+        >
           <UserCircle2 className="h-4 w-4" />
           <span>Unassigned</span>
         </div>
@@ -98,15 +135,14 @@ const IssueCardBody = ({ issue, onOpen, handleProps = {}, isDragging = false }) 
   </button>
 );
 
-const IssueCard = ({ issue, onOpen }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: issue._id,
-      data: {
-        issueId: issue._id,
-        status: issue.status,
-      },
-    });
+const IssueCard = ({ issue, onOpen, isSelected }) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: issue._id,
+    data: {
+      issueId: issue._id,
+      status: issue.status,
+    },
+  });
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -115,16 +151,17 @@ const IssueCard = ({ issue, onOpen }) => {
   return (
     <div ref={setNodeRef} style={style}>
       <IssueCardBody
-        issue={issue}
-        isDragging={isDragging}
-        onOpen={onOpen}
         handleProps={{ ...attributes, ...listeners }}
+        isDragging={isDragging}
+        isSelected={isSelected}
+        issue={issue}
+        onOpen={onOpen}
       />
     </div>
   );
 };
 
-const Column = ({ column, issues, onOpen, isOver }) => {
+const Column = ({ column, issues, onOpen, isOver, selectedIssueId }) => {
   const { setNodeRef } = useDroppable({
     id: column.id,
   });
@@ -132,12 +169,13 @@ const Column = ({ column, issues, onOpen, isOver }) => {
   return (
     <Card
       ref={setNodeRef}
-      className={`kanban-column transition duration-200 ${
-        isOver ? "border-blue-200 bg-blue-50/70" : ""
-      }`}
+      className={cn(
+        "kanban-column border border-slate-200/90 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.94))] p-0 transition duration-200",
+        isOver && "border-teal-200 bg-teal-50/60"
+      )}
     >
       <CardContent className="flex h-full flex-col p-0">
-        <div className="mb-4 border-b border-slate-200 px-4 pb-4">
+        <div className="border-b border-slate-200 px-4 pb-4 pt-4">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-lg font-semibold text-slate-900">{column.label}</p>
@@ -149,9 +187,14 @@ const Column = ({ column, issues, onOpen, isOver }) => {
           </div>
         </div>
 
-        <div className="flex min-h-[380px] flex-1 flex-col gap-3 px-2">
+        <div className="flex min-h-[320px] flex-1 flex-col gap-3 px-3 py-3">
           {issues.map((issue) => (
-            <IssueCard key={issue._id} issue={issue} onOpen={onOpen} />
+            <IssueCard
+              key={issue._id}
+              isSelected={selectedIssueId === issue._id}
+              issue={issue}
+              onOpen={onOpen}
+            />
           ))}
 
           {!issues.length ? (
@@ -165,7 +208,7 @@ const Column = ({ column, issues, onOpen, isOver }) => {
   );
 };
 
-const IssueBoard = ({ issues, onStatusChange, onSelectIssue }) => {
+const IssueBoard = ({ issues, onStatusChange, onSelectIssue, selectedIssueId }) => {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const [boardIssues, setBoardIssues] = useState(issues);
   const [activeIssue, setActiveIssue] = useState(null);
@@ -177,10 +220,8 @@ const IssueBoard = ({ issues, onStatusChange, onSelectIssue }) => {
 
   const groupedIssues = useMemo(
     () =>
-      columns.reduce((accumulator, column) => {
-        accumulator[column.id] = boardIssues.filter(
-          (issue) => issue.status === column.id
-        );
+      issueColumns.reduce((accumulator, column) => {
+        accumulator[column.id] = boardIssues.filter((issue) => issue.status === column.id);
         return accumulator;
       }, {}),
     [boardIssues]
@@ -216,9 +257,7 @@ const IssueBoard = ({ issues, onStatusChange, onSelectIssue }) => {
     const previousIssues = boardIssues;
 
     setBoardIssues((current) =>
-      current.map((issue) =>
-        issue._id === issueId ? { ...issue, status: nextStatus } : issue
-      )
+      current.map((issue) => (issue._id === issueId ? { ...issue, status: nextStatus } : issue))
     );
 
     try {
@@ -232,18 +271,19 @@ const IssueBoard = ({ issues, onStatusChange, onSelectIssue }) => {
     <DndContext
       collisionDetection={closestCorners}
       sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragStart={handleDragStart}
     >
       <div className="grid gap-4 xl:grid-cols-3">
-        {columns.map((column) => (
+        {issueColumns.map((column) => (
           <Column
             key={column.id}
             column={column}
+            isOver={overColumnId === column.id}
             issues={groupedIssues[column.id] || []}
             onOpen={onSelectIssue}
-            isOver={overColumnId === column.id}
+            selectedIssueId={selectedIssueId}
           />
         ))}
       </div>
@@ -251,7 +291,7 @@ const IssueBoard = ({ issues, onStatusChange, onSelectIssue }) => {
       <DragOverlay>
         {activeIssue ? (
           <div className="w-[320px]">
-            <IssueCardBody issue={activeIssue} onOpen={() => {}} isDragging />
+            <IssueCardBody issue={activeIssue} isDragging onOpen={() => {}} />
           </div>
         ) : null}
       </DragOverlay>

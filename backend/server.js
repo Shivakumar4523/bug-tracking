@@ -7,6 +7,8 @@ const { getJwtSecret, getPort } = require("./config/env");
 const connectDB = require("./config/db");
 const { errorHandler, notFound } = require("./middleware/errorMiddleware");
 const authRoutes = require("./routes/authRoutes");
+const commentRoutes = require("./routes/commentRoutes");
+const issueRoutes = require("./routes/issueRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const teamRoutes = require("./routes/teamRoutes");
@@ -29,6 +31,8 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/issues", issueRoutes);
+app.use("/api/comments", commentRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/teams", teamRoutes);
 

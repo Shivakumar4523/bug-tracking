@@ -1,0 +1,4 @@
+Title,Description,Type,Status,Priority,Assignee Email,Due Date
+Checkout API timeout,Investigate intermittent timeout on payment capture,Bug,In Progress,High,user@example.com,2026-04-10
+Refine onboarding copy,Update empty states and product tour text,Task,To Do,Medium,,2026-04-15
+Sprint analytics rollout,Add burndown and velocity widgets to dashboards,Story,To Do,High,admin@example.com,2026-04-18
