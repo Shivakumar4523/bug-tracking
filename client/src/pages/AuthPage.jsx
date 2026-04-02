@@ -66,6 +66,10 @@ const getAuthErrorMessage = (error) => {
     return "Invalid email or password";
   }
 
+  if (!error?.response) {
+    return "Unable to reach the server. Make sure the backend is running on port 5000.";
+  }
+
   return message || "Authentication failed.";
 };
 
@@ -260,6 +264,11 @@ const AuthPage = () => {
                         <p className="mt-2 text-xs text-slate-500">Password: {DEFAULT_USER.password}</p>
                       </button>
                     </div>
+
+                    <p className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500">
+                      Imported users and admin-reset accounts can sign in with the temporary
+                      password <span className="font-semibold text-slate-700">Pirnav@123</span>.
+                    </p>
                   </div>
                 </div>
               ) : null}

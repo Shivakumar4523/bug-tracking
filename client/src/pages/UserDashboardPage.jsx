@@ -6,6 +6,7 @@ import {
   ListTodo,
   PlusCircle,
   RefreshCw,
+  SearchCheck,
 } from "lucide-react";
 import { createIssueReport, fetchMyTasks, updateTask } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
@@ -51,12 +52,14 @@ const UserDashboardPage = () => {
 
   const stats = useMemo(() => {
     const inProgress = tasks.filter((task) => task.status === "in-progress").length;
-    const closed = tasks.filter((task) => task.status === "closed").length;
+    const review = tasks.filter((task) => task.status === "review").length;
+    const done = tasks.filter((task) => task.status === "closed").length;
 
     return {
       total: tasks.length,
       inProgress,
-      closed,
+      review,
+      done,
     };
   }, [tasks]);
 
@@ -111,7 +114,10 @@ const UserDashboardPage = () => {
                 progress
               </div>
               <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
-                <span className="font-semibold text-slate-900">{stats.closed}</span> completed
+                <span className="font-semibold text-slate-900">{stats.review}</span> in review
+              </div>
+              <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+                <span className="font-semibold text-slate-900">{stats.done}</span> done
               </div>
             </div>
           </div>
@@ -129,9 +135,10 @@ const UserDashboardPage = () => {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {isLoading ? (
           <>
+            <Skeleton className="h-36 w-full" />
             <Skeleton className="h-36 w-full" />
             <Skeleton className="h-36 w-full" />
             <Skeleton className="h-36 w-full" />
@@ -151,10 +158,16 @@ const UserDashboardPage = () => {
               value={stats.inProgress}
             />
             <OverviewStatCard
+              icon={<SearchCheck className="h-5 w-5" />}
+              iconClassName="text-violet-500"
+              label="Review"
+              value={stats.review}
+            />
+            <OverviewStatCard
               icon={<CircleCheckBig className="h-5 w-5" />}
               iconClassName="text-emerald-500"
-              label="Closed"
-              value={stats.closed}
+              label="Done"
+              value={stats.done}
             />
           </>
         )}
@@ -181,8 +194,7 @@ const UserDashboardPage = () => {
                 key={task._id}
                 task={task}
                 isUpdating={updateTaskMutation.isPending && updatingTaskId === task._id}
-                onMarkInProgress={(taskId) => handleStatusUpdate(taskId, "in-progress")}
-                onCloseTask={(taskId) => handleStatusUpdate(taskId, "closed")}
+                onStatusChange={handleStatusUpdate}
               />
             ))}
           </div>

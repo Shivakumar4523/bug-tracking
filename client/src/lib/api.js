@@ -40,6 +40,26 @@ export const fetchUsers = async () => {
   return response.data;
 };
 
+export const fetchApps = async () => {
+  const response = await api.get("/apps");
+  return response.data;
+};
+
+export const updateAppConnection = async ({ slug, connected }) => {
+  const response = await api.put(`/apps/${slug}/connection`, { connected });
+  return response.data;
+};
+
+export const updateAppInstallation = async ({ slug, installed }) => {
+  const response = await api.put(`/apps/${slug}/installation`, { installed });
+  return response.data;
+};
+
+export const updateAppAccess = async ({ slug, payload }) => {
+  const response = await api.put(`/apps/${slug}/access`, payload);
+  return response.data;
+};
+
 export const createUser = async (payload) => {
   const response = await api.post("/users", payload);
   return response.data;
@@ -47,6 +67,11 @@ export const createUser = async (payload) => {
 
 export const deleteUser = async (id) => {
   const response = await api.delete(`/users/${id}`);
+  return response.data;
+};
+
+export const resetUserPassword = async (id) => {
+  const response = await api.put(`/users/${id}/reset-password`);
   return response.data;
 };
 
@@ -99,6 +124,11 @@ export const fetchMyTasks = async (filters = {}) => {
   return response.data;
 };
 
+export const fetchTask = async (id) => {
+  const response = await api.get(`/tasks/${id}`);
+  return response.data;
+};
+
 export const createTask = async (payload) => {
   const response = await api.post("/tasks", payload);
   return response.data;
@@ -111,6 +141,24 @@ export const createIssueReport = async (payload) => {
 
 export const updateTask = async ({ id, payload }) => {
   const response = await api.put(`/tasks/${id}`, payload);
+  return response.data;
+};
+
+export const createTaskComment = async ({ taskId, text }) => {
+  const response = await api.post(`/tasks/${taskId}/comments`, { text });
+  return response.data;
+};
+
+export const createTaskWorkLog = async ({ taskId, description, timeSpentHours }) => {
+  const response = await api.post(`/tasks/${taskId}/worklogs`, {
+    description,
+    timeSpentHours,
+  });
+  return response.data;
+};
+
+export const uploadTaskAttachments = async ({ taskId, attachments }) => {
+  const response = await api.post(`/tasks/${taskId}/attachments`, { attachments });
   return response.data;
 };
 

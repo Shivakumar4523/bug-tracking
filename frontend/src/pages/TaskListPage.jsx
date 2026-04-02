@@ -21,6 +21,7 @@ const TaskListPage = () => {
   const [filters, setFilters] = useState({
     search: "",
     status: "all",
+    type: "all",
     priority: "all",
     assignedTo: "all",
   });
@@ -114,6 +115,7 @@ const TaskListPage = () => {
     setFilters({
       search: "",
       status: "all",
+      type: "all",
       priority: "all",
       assignedTo: "all",
     });
@@ -172,6 +174,7 @@ const TaskListPage = () => {
                 isUpdating={updateTaskMutation.isPending && updatingTaskId === task._id}
                 onDeleteTask={handleTaskDelete}
                 onTaskUpdate={handleTaskUpdate}
+                tasks={tasks}
                 users={assignableUsers}
               />
             ) : (
@@ -179,16 +182,7 @@ const TaskListPage = () => {
                 key={task._id}
                 task={task}
                 isUpdating={updateTaskMutation.isPending && updatingTaskId === task._id}
-                onMarkInProgress={(taskId) =>
-                  handleTaskUpdate(taskId, {
-                    status: "in-progress",
-                  })
-                }
-                onCloseTask={(taskId) =>
-                  handleTaskUpdate(taskId, {
-                    status: "closed",
-                  })
-                }
+                onStatusChange={(taskId, status) => handleTaskUpdate(taskId, { status })}
               />
             )
           )}

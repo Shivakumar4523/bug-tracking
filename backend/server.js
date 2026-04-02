@@ -3,6 +3,7 @@ dotenv.config();
 
 const cors = require("cors");
 const express = require("express");
+const appRoutes = require("./routes/appRoutes");
 const { getJwtSecret, getPort } = require("./config/env");
 const connectDB = require("./config/db");
 const { errorHandler, notFound } = require("./middleware/errorMiddleware");
@@ -20,7 +21,7 @@ const PORT = getPort();
 app.disable("x-powered-by");
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "15mb" }));
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/apps", appRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/issues", issueRoutes);
@@ -44,9 +46,23 @@ const startServer = async () => {
   await connectDB();
   await ensureDefaultUser();
 
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
+  });
+
+  server.on("error", (error) => {
+    if (error.code === "EADDRINUSE") {
+      console.error(
+        `Port ${PORT} is already in use. Stop the existing backend or change PORT in backend/.env.`
+      );
+      process.exit(1);
+    }
+
+    throw error;
   });
 };
 
-startServer();
+startServer().catch((error) => {
+  console.error(error.message || "Unable to start server.");
+  process.exit(1);
+});

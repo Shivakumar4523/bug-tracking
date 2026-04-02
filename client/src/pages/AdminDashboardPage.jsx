@@ -55,6 +55,7 @@ const AdminDashboardPage = () => {
   const [taskFilters, setTaskFilters] = useState({
     search: "",
     status: "all",
+    type: "all",
     priority: "all",
     assignedTo: "all",
   });
@@ -277,6 +278,7 @@ const AdminDashboardPage = () => {
     setTaskFilters({
       search: "",
       status: "all",
+      type: "all",
       priority: "all",
       assignedTo: "all",
     });
@@ -570,9 +572,9 @@ const AdminDashboardPage = () => {
               </p>
             </div>
             <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
-              <p className="text-sm font-semibold text-slate-900">Closed delivery</p>
+              <p className="text-sm font-semibold text-slate-900">Completed delivery</p>
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                {stats.closedTasks} tasks have already been completed and closed.
+                {stats.closedTasks} tasks have already been completed and marked done.
               </p>
             </div>
             <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
@@ -803,6 +805,7 @@ const AdminDashboardPage = () => {
                 isUpdating={updateTaskMutation.isPending && updatingTaskId === task._id}
                 onDeleteTask={handleTaskDelete}
                 onTaskUpdate={handleTaskUpdate}
+                tasks={tasks}
                 users={assignableUsers}
               />
             ))}
@@ -845,6 +848,7 @@ const AdminDashboardPage = () => {
         }}
         onSubmit={(payload) => createTaskMutation.mutateAsync(payload)}
         open={isCreateTaskOpen}
+        tasks={tasks}
         users={assignableUsers}
       />
 

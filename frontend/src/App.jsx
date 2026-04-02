@@ -9,6 +9,7 @@ import PeopleTeamsPage from "@/pages/PeopleTeamsPage";
 import ProfilePage from "@/pages/ProfilePage";
 import ReportsPage from "@/pages/ReportsPage";
 import ProjectsPage from "@/pages/ProjectsPage";
+import TaskListPage from "@/pages/TaskListPage";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -56,7 +57,7 @@ const App = () => (
         <Route path="/people" element={<PeopleTeamsPage />} />
         <Route path="/apps" element={<AppsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/tasks" element={<Navigate to="/filters" replace />} />
+        <Route path="/tasks" element={<TaskListPage />} />
         <Route path="/issues" element={<Navigate to="/filters" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

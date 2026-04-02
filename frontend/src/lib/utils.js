@@ -25,6 +25,34 @@ export const formatDateTime = (value, options = {}) =>
       }).format(new Date(value))
     : "N/A";
 
+export const formatHours = (value = 0) => {
+  const hours = Number(value || 0);
+
+  if (!hours) {
+    return "0h";
+  }
+
+  return `${hours % 1 === 0 ? hours.toFixed(0) : hours.toFixed(1)}h`;
+};
+
+export const formatFileSize = (value = 0) => {
+  const size = Number(value || 0);
+
+  if (!size) {
+    return "0 B";
+  }
+
+  if (size < 1024) {
+    return `${size} B`;
+  }
+
+  if (size < 1024 * 1024) {
+    return `${(size / 1024).toFixed(1)} KB`;
+  }
+
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+};
+
 export const getInitials = (name = "") =>
   name
     .split(" ")
@@ -54,6 +82,10 @@ export const filterTasks = (tasks = [], filters = {}) => {
       return false;
     }
 
+    if (filters.type && filters.type !== "all" && task.type !== filters.type) {
+      return false;
+    }
+
     if (filters.assignedTo && filters.assignedTo !== "all") {
       if (filters.assignedTo === "unassigned") {
         if (task.assignedTo?._id) {
@@ -71,10 +103,17 @@ export const filterTasks = (tasks = [], filters = {}) => {
     const searchableContent = [
       task.title,
       task.description,
+      task.typeLabel,
+      task.environment,
       task.assignedTo?.name,
       task.assignedTo?.email,
       task.createdBy?.name,
       task.createdBy?.email,
+      ...(task.labels || []),
+      ...(task.components || []),
+      ...(task.fixVersions || []),
+      ...(task.affectsVersions || []),
+      ...(task.watchers || []).map((watcher) => watcher?.name),
     ]
       .filter(Boolean)
       .join(" ")

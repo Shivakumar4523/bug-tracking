@@ -2,6 +2,7 @@ import { useDeferredValue, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   FolderKanban,
+  KeyRound,
   Search,
   ShieldCheck,
   Trash2,
@@ -20,6 +21,7 @@ import {
   fetchTeams,
   fetchUsers,
   importIssues,
+  resetUserPassword,
   updateProject,
 } from "@/lib/api";
 import IssueImportDialog from "@/components/issues/IssueImportDialog";
@@ -51,6 +53,7 @@ const PeopleTeamsPage = () => {
   const [editingProject, setEditingProject] = useState(null);
   const [deletingUserId, setDeletingUserId] = useState("");
   const [deletingProjectId, setDeletingProjectId] = useState("");
+  const [resettingUserId, setResettingUserId] = useState("");
   const [userSearch, setUserSearch] = useState("");
   const deferredUserSearch = useDeferredValue(userSearch);
 
@@ -164,6 +167,13 @@ const PeopleTeamsPage = () => {
     },
     onSettled: () => {
       setDeletingUserId("");
+    },
+  });
+
+  const resetUserPasswordMutation = useMutation({
+    mutationFn: resetUserPassword,
+    onSettled: () => {
+      setResettingUserId("");
     },
   });
 
@@ -311,27 +321,58 @@ const PeopleTeamsPage = () => {
                           Joined {formatDate(entry.createdAt)}
                         </p>
                         {entry.role !== "Admin" ? (
-                          <Button
-                            disabled={deleteUserMutation.isPending && deletingUserId === entry._id}
-                            size="sm"
-                            type="button"
-                            variant="destructive"
-                            onClick={() => {
-                              const confirmed = window.confirm(
-                                "Remove this user? Their project links, teams, and issue ownership will be cleaned up."
-                              );
-
-                              if (!confirmed) {
-                                return;
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              disabled={
+                                resetUserPasswordMutation.isPending && resettingUserId === entry._id
                               }
+                              size="sm"
+                              type="button"
+                              variant="secondary"
+                              onClick={() => {
+                                const confirmed = window.confirm(
+                                  `Reset the password for ${entry.email}? The temporary password will become Pirnav@123.`
+                                );
 
-                              setDeletingUserId(entry._id);
-                              deleteUserMutation.mutate(entry._id);
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Remove
-                          </Button>
+                                if (!confirmed) {
+                                  return;
+                                }
+
+                                setResettingUserId(entry._id);
+                                resetUserPasswordMutation.mutate(entry._id, {
+                                  onSuccess: (data) => {
+                                    window.alert(
+                                      `${data.message}\nTemporary password: ${data.temporaryPassword}`
+                                    );
+                                  },
+                                });
+                              }}
+                            >
+                              <KeyRound className="h-4 w-4" />
+                              Reset Password
+                            </Button>
+                            <Button
+                              disabled={deleteUserMutation.isPending && deletingUserId === entry._id}
+                              size="sm"
+                              type="button"
+                              variant="destructive"
+                              onClick={() => {
+                                const confirmed = window.confirm(
+                                  "Remove this user? Their project links, teams, and issue ownership will be cleaned up."
+                                );
+
+                                if (!confirmed) {
+                                  return;
+                                }
+
+                                setDeletingUserId(entry._id);
+                                deleteUserMutation.mutate(entry._id);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Remove
+                            </Button>
+                          </div>
                         ) : null}
                       </div>
                     </div>

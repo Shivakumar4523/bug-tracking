@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChartNoAxesColumn, CircleCheckBig, Clock3, Flame } from "lucide-react";
+import { ChartNoAxesColumn, CircleCheckBig, Clock3, Flame, SearchCheck } from "lucide-react";
 import { fetchMyTasks, fetchTasks } from "@/lib/api";
 import OverviewStatCard from "@/components/dashboard/OverviewStatCard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
-import { normalizeRole, titleCase } from "@/lib/utils";
+import { normalizeRole } from "@/lib/utils";
+import { getTaskPriorityLabel, getTaskStatusLabel } from "@/lib/workspace";
 
 const ReportsPage = () => {
   const { user } = useAuth();
@@ -39,6 +40,7 @@ const ReportsPage = () => {
     const counts = {
       open: 0,
       "in-progress": 0,
+      review: 0,
       closed: 0,
     };
 
@@ -70,9 +72,10 @@ const ReportsPage = () => {
         </p>
       </div>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-4">
         {isLoading ? (
           <>
+            <Skeleton className="h-36 w-full" />
             <Skeleton className="h-36 w-full" />
             <Skeleton className="h-36 w-full" />
             <Skeleton className="h-36 w-full" />
@@ -82,7 +85,7 @@ const ReportsPage = () => {
             <OverviewStatCard
               icon={<ChartNoAxesColumn className="h-5 w-5" />}
               iconClassName="text-blue-600"
-              label="Open Tasks"
+              label="To Do"
               value={statusBreakdown.open}
             />
             <OverviewStatCard
@@ -92,9 +95,15 @@ const ReportsPage = () => {
               value={statusBreakdown["in-progress"]}
             />
             <OverviewStatCard
+              icon={<SearchCheck className="h-5 w-5" />}
+              iconClassName="text-violet-500"
+              label="Review"
+              value={statusBreakdown.review}
+            />
+            <OverviewStatCard
               icon={<CircleCheckBig className="h-5 w-5" />}
               iconClassName="text-emerald-500"
-              label="Closed"
+              label="Done"
               value={statusBreakdown.closed}
             />
           </>
@@ -116,7 +125,7 @@ const ReportsPage = () => {
                 className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
               >
                 <span className="text-sm font-medium text-slate-700">
-                  {titleCase(status)}
+                  {getTaskStatusLabel(status)}
                 </span>
                 <span className="text-sm font-semibold text-slate-900">{count}</span>
               </div>
@@ -140,7 +149,7 @@ const ReportsPage = () => {
                 <div className="flex items-center gap-2">
                   <Flame className="h-4 w-4 text-blue-500" />
                   <span className="text-sm font-medium text-slate-700">
-                    {titleCase(priority)}
+                    {getTaskPriorityLabel(priority)}
                   </span>
                 </div>
                 <span className="text-sm font-semibold text-slate-900">{count}</span>

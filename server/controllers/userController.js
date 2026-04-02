@@ -9,7 +9,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const { isAdminRole, normalizeRole, USER_ROLE } = require("../utils/roles");
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
-const DEFAULT_BULK_IMPORT_PASSWORD = "Pirnav@123";
+const TEMPORARY_USER_PASSWORD = "Pirnav@123";
 
 const serializeUser = (user) => ({
   _id: user._id,
@@ -30,7 +30,7 @@ const buildBulkImportSummary = ({
   skippedCount: invalidRows.length,
   importedUsers,
   invalidRows,
-  temporaryPassword: DEFAULT_BULK_IMPORT_PASSWORD,
+  temporaryPassword: TEMPORARY_USER_PASSWORD,
 });
 
 const getUsers = asyncHandler(async (req, res) => {
@@ -164,7 +164,7 @@ const bulkImportUsers = asyncHandler(async (req, res) => {
       const user = await User.create({
         name: candidate.name,
         email: candidate.email,
-        password: DEFAULT_BULK_IMPORT_PASSWORD,
+        password: TEMPORARY_USER_PASSWORD,
         role: USER_ROLE,
       });
 
@@ -186,6 +186,35 @@ const bulkImportUsers = asyncHandler(async (req, res) => {
   });
 
   res.status(importedUsers.length ? 201 : 200).json(summary);
+});
+
+const resetUserPassword = asyncHandler(async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.status(400);
+    throw new Error("Invalid user id");
+  }
+
+  const user = await User.findById(req.params.id).select("name email role password");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  if (isAdminRole(user.role)) {
+    res.status(403);
+    throw new Error("Admin accounts cannot be reset from this view");
+  }
+
+  user.password = TEMPORARY_USER_PASSWORD;
+  await user.save();
+
+  res.status(200).json({
+    message: `Password reset for ${user.email}`,
+    id: req.params.id,
+    email: user.email,
+    temporaryPassword: TEMPORARY_USER_PASSWORD,
+  });
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
@@ -271,5 +300,6 @@ module.exports = {
   getUsers,
   createUser,
   bulkImportUsers,
+  resetUserPassword,
   deleteUser,
 };

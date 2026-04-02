@@ -20,7 +20,7 @@ const ProfilePage = () => {
     () => ({
       total: tasks.length,
       active: tasks.filter((task) => task.status !== "closed").length,
-      closed: tasks.filter((task) => task.status === "closed").length,
+      done: tasks.filter((task) => task.status === "closed").length,
     }),
     [tasks]
   );
@@ -78,8 +78,8 @@ const ProfilePage = () => {
             <p className="mt-3 text-3xl font-semibold text-slate-900">{stats.active}</p>
           </div>
           <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
-            <p className="text-sm text-slate-500">Closed</p>
-            <p className="mt-3 text-3xl font-semibold text-slate-900">{stats.closed}</p>
+            <p className="text-sm text-slate-500">Done</p>
+            <p className="mt-3 text-3xl font-semibold text-slate-900">{stats.done}</p>
           </div>
         </CardContent>
       </Card>

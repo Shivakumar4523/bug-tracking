@@ -1,6 +1,11 @@
 import { RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  taskPriorityOptions,
+  taskStatusOptions,
+  taskTypeOptions,
+} from "@/lib/workspace";
 
 const TaskFiltersBar = ({
   filters,
@@ -31,12 +36,12 @@ const TaskFiltersBar = ({
         </Button>
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,0.8fr))]">
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,0.8fr))]">
         <div className="relative">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             className="pl-11"
-            placeholder="Search by title, description, assignee, or reporter"
+            placeholder="Search by summary, labels, components, assignee, or reporter"
             value={filters.search}
             onChange={(event) => onChange("search", event.target.value)}
           />
@@ -48,9 +53,24 @@ const TaskFiltersBar = ({
           onChange={(event) => onChange("status", event.target.value)}
         >
           <option value="all">All status</option>
-          <option value="open">Open</option>
-          <option value="in-progress">In Progress</option>
-          <option value="closed">Closed</option>
+          {taskStatusOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="field-select"
+          value={filters.type}
+          onChange={(event) => onChange("type", event.target.value)}
+        >
+          <option value="all">All types</option>
+          {taskTypeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
 
         <select
@@ -59,9 +79,11 @@ const TaskFiltersBar = ({
           onChange={(event) => onChange("priority", event.target.value)}
         >
           <option value="all">All priority</option>
-          <option value="low">Low priority</option>
-          <option value="medium">Medium priority</option>
-          <option value="high">High priority</option>
+          {taskPriorityOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
 
         {showAssignee ? (
